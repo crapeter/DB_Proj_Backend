@@ -3,7 +3,6 @@ package CS._4.Project.Services;
 import CS._4.Project.DTOs.*;
 import CS._4.Project.Models.User;
 import CS._4.Project.Repositories.UserRepository;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -21,7 +20,9 @@ import java.util.Base64;
 public class UserService {
   private final UserRepository userRepo;
 
-  private static final String ALGORITHM = System.getenv("ALGORITHM");
+  private static final String FACTORY_ALGORITHM = System.getenv("FACTORY_ALGORITHM");
+  private static final String SPEC_ALGORITHM = System.getenv("SPEC_ALGORITHM");
+  private static final String CIPHER_ALGORITHM = System.getenv("CIPHER_ALGORITHM");
   private static final String SECRET_KEY = System.getenv("SECRET_KEY");
   private static final String INIT_VECTOR = System.getenv("INIT_VECTOR");
 
@@ -59,14 +60,14 @@ public class UserService {
       SecureRandom secureRandom = new SecureRandom();
       secureRandom.nextBytes(salt);
 
-      SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA1");
+      SecretKeyFactory factory = SecretKeyFactory.getInstance(FACTORY_ALGORITHM);
       KeySpec spec = new PBEKeySpec(SECRET_KEY.toCharArray(), salt, 65536, 256);
       SecretKey secretKey = factory.generateSecret(spec);
-      SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), "AES");
+      SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), SPEC_ALGORITHM);
 
       IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes());
 
-      Cipher cipher = Cipher.getInstance(ALGORITHM);
+      Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
       cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
       byte[] encrypted = cipher.doFinal(password.getBytes());
 
