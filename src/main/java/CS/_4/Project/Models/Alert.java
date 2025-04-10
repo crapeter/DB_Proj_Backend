@@ -31,8 +31,8 @@ public class Alert {
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumns({
-      @JoinColumn(name = "C_Id", referencedColumnName = "C_Id", nullable = false),
-      @JoinColumn(name = "U_Id", referencedColumnName = "U_Id", nullable = false)
+    @JoinColumn(name = "C_Id", referencedColumnName = "C_Id", nullable = false),
+    @JoinColumn(name = "U_Id", referencedColumnName = "U_Id", nullable = false)
   })
   private Caller c;
 

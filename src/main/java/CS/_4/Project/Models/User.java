@@ -1,5 +1,6 @@
 package CS._4.Project.Models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,12 +18,15 @@ public class User {
   private Long id;
 
   @Column(name = "F_Name", length = 50)
+  @JsonProperty("fName")
   private String fName;
 
   @Column(name = "M_Init", length = 1)
+  @JsonProperty("mInit")
   private String mInit;
 
   @Column(name = "L_Name", length = 50)
+  @JsonProperty("lName")
   private String lName;
 
   @Column(name = "Email", length = 100)
