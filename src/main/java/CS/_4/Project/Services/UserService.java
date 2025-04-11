@@ -6,14 +6,13 @@ import CS._4.Project.Repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.Cipher;
-import javax.crypto.SecretKey;
-import javax.crypto.SecretKeyFactory;
+import javax.crypto.*;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.PBEKeySpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.security.SecureRandom;
 import java.security.spec.KeySpec;
+import java.util.Arrays;
 import java.util.Base64;
 
 @Service
@@ -23,8 +22,6 @@ public class UserService {
   private static final String FACTORY_ALGORITHM = System.getenv("FACTORY_ALGORITHM");
   private static final String SPEC_ALGORITHM = System.getenv("SPEC_ALGORITHM");
   private static final String CIPHER_ALGORITHM = System.getenv("CIPHER_ALGORITHM");
-  private static final String SECRET_KEY = System.getenv("SECRET_KEY");
-  private static final String INIT_VECTOR = System.getenv("INIT_VECTOR");
 
   public UserService(UserRepository userRepo) {
     this.userRepo = userRepo;
@@ -54,27 +51,69 @@ public class UserService {
     return Mapper.toUserInfoDtoList(userRepo.findAll());
   }
 
+  public ResponseEntity<String> correctPassword(String password, String email) {
+    User user = userRepo.findByEmail(email);
+    if (user == null) {
+      return ResponseEntity.status(404).body("User not found");
+    }
+
+    EncryptionString storedData = new EncryptionString(user.getPassword(), user.getSalt());
+    if (validatePassword(password, storedData)) {
+      return ResponseEntity.ok("Password is correct");
+    } else {
+      return ResponseEntity.status(401).body("Incorrect password");
+    }
+  }
+
+  private boolean validatePassword(String password, EncryptionString storedData) {
+    try {
+      byte[] encrypted = Base64.getDecoder().decode(storedData.encryptedData());
+
+      String[] saltAndIv = storedData.salt().split(":");
+      byte[] salt = Base64.getDecoder().decode(saltAndIv[0]);
+      byte[] iv = Base64.getDecoder().decode(saltAndIv[1]);
+
+      byte[] encryptedPassword = genCodes(password, salt, iv);
+      return Arrays.equals(encrypted, encryptedPassword);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
   private EncryptionString encrypt(String password) {
     try {
       byte[] salt = new byte[16];
       SecureRandom secureRandom = new SecureRandom();
       secureRandom.nextBytes(salt);
 
+      byte[] iv = new byte[16];
+      secureRandom.nextBytes(iv);
+
+      byte[] encrypted = genCodes(password, salt, iv);
+
+      String encryptedBase64 = Base64.getEncoder().encodeToString(encrypted);
+      String saltAndIvBase64 = Base64.getEncoder().encodeToString(salt) + ":" + Base64.getEncoder().encodeToString(iv);
+
+      return new EncryptionString(encryptedBase64, saltAndIvBase64);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+    return null;
+  }
+
+  private byte[] genCodes(String password, byte[] salt, byte[] iv) {
+    try {
       SecretKeyFactory factory = SecretKeyFactory.getInstance(FACTORY_ALGORITHM);
-      KeySpec spec = new PBEKeySpec(SECRET_KEY.toCharArray(), salt, 65536, 256);
+      KeySpec spec = new PBEKeySpec(password.toCharArray(), salt, 65536, 256);
       SecretKey secretKey = factory.generateSecret(spec);
       SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getEncoded(), SPEC_ALGORITHM);
 
-      IvParameterSpec iv = new IvParameterSpec(INIT_VECTOR.getBytes());
-
+      IvParameterSpec ivParameterSpec = new IvParameterSpec(iv);
       Cipher cipher = Cipher.getInstance(CIPHER_ALGORITHM);
-      cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, iv);
-      byte[] encrypted = cipher.doFinal(password.getBytes());
+      cipher.init(Cipher.ENCRYPT_MODE, secretKeySpec, ivParameterSpec);
 
-      String encryptedBase64 = Base64.getEncoder().encodeToString(encrypted);
-      String saltBase64 = Base64.getEncoder().encodeToString(salt);
-
-      return new EncryptionString(encryptedBase64, saltBase64);
+      return cipher.doFinal(password.getBytes());
     } catch (Exception e) {
       e.printStackTrace();
     }

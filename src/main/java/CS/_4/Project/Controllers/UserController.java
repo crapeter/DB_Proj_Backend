@@ -20,6 +20,11 @@ public class UserController {
     return userService.registerUser(user);
   }
 
+  @GetMapping("/login")
+  public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+    return userService.correctPassword(password, email);
+  }
+
   @GetMapping
   public Iterable<UserDto> getAllUsers() {
     return userService.getAllUsers();
