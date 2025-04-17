@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
@@ -62,8 +63,14 @@ public class AlertService {
     alertRepo.save(alert);
 
     // Getting the resource type
-    String resourceType = alertDto.getResourceType();
-    Resource resource = resourceRepo.getResourceByRType(resourceType);
+    List<String> resourceType = alertDto.getResourceType();
+    List<Resource> resources = new ArrayList<>();
+    for (String type : resourceType) {
+      Resource resource = resourceRepo.getResourceByRType(type);
+      if (resource != null) {
+        resources.add(resource);
+      }
+    }
 
     // Get the department and response team
     AssignedDepartments assignedDepartments = assign();
@@ -76,16 +83,23 @@ public class AlertService {
     // Dispatch the response team
     responseTeam.setDispatched(true);
 
-    // creation of the incident report
-    IncidentReport incidentReport = new IncidentReport();
-    incidentReport.setIrDate(LocalDate.now());
-    incidentReport.setIrDescription("Incident report for alert: " + alert.getId());
-    incidentReport.setD(department);
-    incidentReport.setA(alert);
-    incidentReport.setR(resource);
-    ResponseEntity<String> successfulCreation = incidentReportService.create(incidentReport);
+    // creation of the incident report(s)
+    IncidentReport incidentReport = null;
+    for (Resource r : resources) {
+      incidentReport = new IncidentReport();
+      incidentReport.setIrDate(LocalDate.now());
+      incidentReport.setIrDescription("Incident report for alert: " + alert.getId());
+      incidentReport.setD(department);
+      incidentReport.setA(alert);
+      incidentReport.setR(r);
+      ResponseEntity<String> successfulCreation = incidentReportService.create(incidentReport);
 
-    if (successfulCreation.getStatusCode().isError()) {
+      if (successfulCreation.getStatusCode().isError()) {
+        return ResponseEntity.badRequest().body("Failed to create incident report");
+      }
+    }
+
+    if (incidentReport == null) {
       return ResponseEntity.badRequest().body("Failed to create incident report");
     }
 

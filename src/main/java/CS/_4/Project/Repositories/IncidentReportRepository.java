@@ -8,6 +8,6 @@ import org.springframework.data.jpa.repository.Query;
 import java.util.List;
 
 public interface IncidentReportRepository extends JpaRepository<IncidentReport, Long> {
-  @Query("select ir.r from IncidentReport ir where ir.d.id = ?1 and ir.a.id = ?2")
+  @Query("select ir.r.id from IncidentReport ir where ir.d.id = ?1 and ir.a.id = ?2")
   List<Long> findByDIdandAId(Long dId, Long aId);
 }

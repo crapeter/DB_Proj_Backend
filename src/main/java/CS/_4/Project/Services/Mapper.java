@@ -131,7 +131,7 @@ public class Mapper {
     rti_Dto.setReportTime(incidentReport.getIrDate());
     rti_Dto.setResources(resources);
 
-    return null;
+    return rti_Dto;
   }
 
   public List<UserDto> toUserDtoList(List<User> users) {
