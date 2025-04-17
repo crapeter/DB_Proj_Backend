@@ -6,7 +6,8 @@ import lombok.Setter;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-@SuppressWarnings("JpaDataSourceORMInspection")
+import java.time.LocalDateTime;
+
 @Getter
 @Setter
 @Entity
@@ -27,12 +28,15 @@ public class Alert {
   @Column(name = "Location")
   private String location;
 
+  @Column(name = "Time_Stamp")
+  private LocalDateTime createdAt;
+
   // U_Id shows a warning, but it is not a problem
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumns({
-    @JoinColumn(name = "C_Id", referencedColumnName = "C_Id", nullable = false),
-    @JoinColumn(name = "U_Id", referencedColumnName = "U_Id", nullable = false)
+      @JoinColumn(name = "C_Id", referencedColumnName = "C_Id", nullable = false),
+      @JoinColumn(name = "U_Id", referencedColumnName = "U_Id", nullable = false)
   })
   private Caller c;
 

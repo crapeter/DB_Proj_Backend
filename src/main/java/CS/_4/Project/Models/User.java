@@ -29,7 +29,7 @@ public class User {
   @JsonProperty("lName")
   private String lName;
 
-  @Column(name = "Email", length = 100)
+  @Column(name = "Email", length = 100, unique = true)
   private String email;
 
   @Column(name = "Password")

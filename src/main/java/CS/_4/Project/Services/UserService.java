@@ -1,7 +1,12 @@
 package CS._4.Project.Services;
 
 import CS._4.Project.DTOs.*;
+import CS._4.Project.Models.Caller;
+import CS._4.Project.Models.CallerId;
+import CS._4.Project.Models.FirstResponder;
 import CS._4.Project.Models.User;
+import CS._4.Project.Repositories.CallerRepository;
+import CS._4.Project.Repositories.FirstResponderRepository;
 import CS._4.Project.Repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -14,17 +19,22 @@ import java.security.SecureRandom;
 import java.security.spec.KeySpec;
 import java.util.Arrays;
 import java.util.Base64;
+import java.util.List;
 
 @Service
 public class UserService {
   private final UserRepository userRepo;
+  private final FirstResponderRepository firstResponderRepo;
+  private final CallerRepository callerRepo;
 
   private static final String FACTORY_ALGORITHM = System.getenv("FACTORY_ALGORITHM");
   private static final String SPEC_ALGORITHM = System.getenv("SPEC_ALGORITHM");
   private static final String CIPHER_ALGORITHM = System.getenv("CIPHER_ALGORITHM");
 
-  public UserService(UserRepository userRepo) {
+  public UserService(UserRepository userRepo, FirstResponderRepository firstResponderRepo, CallerRepository callerRepo) {
     this.userRepo = userRepo;
+    this.firstResponderRepo = firstResponderRepo;
+    this.callerRepo = callerRepo;
   }
 
   public ResponseEntity<String> registerUser(User user) {
@@ -58,7 +68,21 @@ public class UserService {
     }
 
     EncryptionString storedData = new EncryptionString(user.getPassword(), user.getSalt());
+
     if (validatePassword(password, storedData)) {
+      FirstResponder firstResponder = firstResponderRepo.findByUId(user.getId());
+      List<Long> callerUserIds = callerRepo.findByUId(user.getId());
+      if (firstResponder == null && !callerUserIds.contains(user.getId())) {
+        CallerId callerId = new CallerId();
+        callerId.setUId(user.getId());
+        callerId.setCId(callerRepo.findMaxCId() + 1);
+
+        Caller caller = new Caller();
+        caller.setId(callerId);
+        caller.setU(user);
+
+        callerRepo.save(caller);
+      }
       return ResponseEntity.ok("Password is correct");
     } else {
       return ResponseEntity.status(401).body("Incorrect password");

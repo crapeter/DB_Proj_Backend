@@ -1,4 +1,48 @@
 package CS._4.Project.Controllers;
 
+import CS._4.Project.DTOs.AlertDto;
+import CS._4.Project.Services.AlertService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDateTime;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/alerts")
 public class AlertController {
+  private final AlertService alertService;
+
+  public AlertController(AlertService alertService) {
+    this.alertService = alertService;
+  }
+
+  // Get all alerts
+  @GetMapping
+  public ResponseEntity<List<AlertDto>> getAllAlerts() {
+    List<AlertDto> alerts = alertService.getAllAlerts();
+    return ResponseEntity.ok(alerts);
+  }
+
+  @PostMapping("/create")
+  public ResponseEntity<String> createAlert(@RequestBody AlertDto alertDto) {
+    // Logic to create an alert
+    return ResponseEntity.ok("Alert created successfully");
+  }
+
+  @GetMapping("/previous")
+  public Iterable<AlertDto> previousDaysAlerts() {
+    // Hardcoded to 1 day for data display on the frontend
+    return alertService.previousDaysAlerts(1);
+  }
+
+  /*
+  * For the Frontend (ReactJS) use this
+  * const date = new Date();
+  * const isoString = date.toISOString();
+  * */
+  @GetMapping("/specific/day")
+  public Iterable<AlertDto> specificDayAlerts(@RequestParam LocalDateTime day) {
+    return alertService.specificDayAlerts(day);
+  }
 }

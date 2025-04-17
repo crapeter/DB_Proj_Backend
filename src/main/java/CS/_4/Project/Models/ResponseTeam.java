@@ -26,4 +26,6 @@ public class ResponseTeam {
   @JoinColumn(name = "Team_Lead")
   private FirstResponder teamLead;
 
+  @Column(name = "dispatched")
+  private boolean dispatched;
 }

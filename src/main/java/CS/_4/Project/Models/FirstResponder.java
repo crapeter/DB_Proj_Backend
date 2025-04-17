@@ -19,7 +19,7 @@ public class FirstResponder {
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "U_Id")
-  private CS._4.Project.Models.User u;
+  private User u;
 
   @ManyToOne(fetch = FetchType.LAZY)
   @OnDelete(action = OnDeleteAction.SET_NULL)

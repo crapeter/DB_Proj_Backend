@@ -14,7 +14,7 @@ public class Resource {
   @Column(name = "R_Id", nullable = false)
   private Long id;
 
-  @Column(name = "R_Type", length = 100)
+  @Column(name = "R_Type", length = 100, unique = true)
   private String rType;
 
   @Column(name = "Quantity")
