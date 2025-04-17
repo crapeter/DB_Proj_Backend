@@ -6,14 +6,14 @@ import CS._4.Project.Repositories.EmergencyContactRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
 public class EmergencyContactService {
   private final EmergencyContactRepository emergencyContactRepo;
+  private final Mapper mapper;
 
-  public EmergencyContactService(EmergencyContactRepository emergencyContactRepo) {
+  public EmergencyContactService(EmergencyContactRepository emergencyContactRepo, Mapper mapper) {
     this.emergencyContactRepo = emergencyContactRepo;
+    this.mapper = mapper;
   }
 
   public ResponseEntity<String> createEC(EmergencyContact EC) {
@@ -31,7 +31,7 @@ public class EmergencyContactService {
       return ResponseEntity.notFound().build();
     }
     EmergencyContactDto ecDto = new EmergencyContactDto();
-    ecDto = Mapper.toEmergencyContactDto(optEC);
+    ecDto = mapper.toEmergencyContactDto(optEC);
     return ResponseEntity.ok(ecDto);
   }
 }

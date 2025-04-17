@@ -7,6 +7,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 
 @Getter
 @Setter
@@ -29,7 +30,7 @@ public class ResponseTeamIncident {
   private IncidentReport ir;
 
   @Column(name = "Time_Dispatched")
-  private Instant timeDispatched;
+  private LocalDateTime timeDispatched;
 
   @Column(name = "Dispatch_Status", length = 50)
   private String dispatchStatus;

@@ -24,12 +24,14 @@ public class AlertService {
   private final ResponseTeamRepository responseTeamRepo;
   private final ResponseTeamIncidentRepository responseTeamIncidentRepo;
   private final IncidentReportService incidentReportService;
+  private final Mapper mapper;
 
   public AlertService(
       AlertRepository alertRepo, UserRepository userRepo,
       CallerRepository callerRepo, IncidentReportService incidentReportService,
       ResourceRepository resourceRepo, DepartmentRepository departmentRepo,
-      ResponseTeamRepository responseTeamRepo, ResponseTeamIncidentRepository responseTeamIncidentRepo
+      ResponseTeamRepository responseTeamRepo, ResponseTeamIncidentRepository responseTeamIncidentRepo,
+      Mapper mapper
   ) {
     this.alertRepo = alertRepo;
     this.userRepo = userRepo;
@@ -39,6 +41,7 @@ public class AlertService {
     this.departmentRepo = departmentRepo;
     this.responseTeamRepo = responseTeamRepo;
     this.responseTeamIncidentRepo = responseTeamIncidentRepo;
+    this.mapper = mapper;
   }
 
   /*
@@ -59,7 +62,7 @@ public class AlertService {
     alertRepo.save(alert);
 
     // Getting the resource type
-    String resourceType = alertDto.getAlertType();
+    String resourceType = alertDto.getResourceType();
     Resource resource = resourceRepo.getResourceByRType(resourceType);
 
     // Get the department and response team
@@ -96,7 +99,7 @@ public class AlertService {
     responseTeamIncident.setId(responseTeamIncidentId);
     responseTeamIncident.setIr(incidentReport);
     responseTeamIncident.setRt(responseTeam);
-    responseTeamIncident.setTimeDispatched(Instant.from(LocalDateTime.now()));
+    responseTeamIncident.setTimeDispatched(LocalDateTime.now());
     responseTeamIncident.setDispatchStatus("Dispatched");
     responseTeamIncidentRepo.save(responseTeamIncident);
 
@@ -105,20 +108,20 @@ public class AlertService {
 
   public List<AlertDto> getAllAlerts() {
     return alertRepo.findAll().stream()
-        .map(Mapper::toAlertDto)
+        .map(mapper::toAlertDto)
         .toList();
   }
 
   public List<AlertDto> previousDaysAlerts(int days) {
     LocalDateTime cutOff = LocalDateTime.now().minusDays(days);
     return alertRepo.findPreviousDaysAlerts(cutOff).stream()
-        .map(Mapper::toAlertDto)
+        .map(mapper::toAlertDto)
         .toList();
   }
 
   public List<AlertDto> specificDayAlerts(LocalDateTime day) {
     return alertRepo.findSpecificDayAlerts(day).stream()
-        .map(Mapper::toAlertDto)
+        .map(mapper::toAlertDto)
         .toList();
   }
 

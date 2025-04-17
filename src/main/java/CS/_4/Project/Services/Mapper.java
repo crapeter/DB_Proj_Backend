@@ -3,24 +3,32 @@ package CS._4.Project.Services;
 import CS._4.Project.DTOs.*;
 import CS._4.Project.Models.*;
 import CS._4.Project.Repositories.FirstResponderRepository;
+import CS._4.Project.Repositories.IncidentReportRepository;
 import CS._4.Project.Repositories.ResourceRepository;
 import CS._4.Project.Repositories.UserRepository;
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
+@Service
 public class Mapper {
-  private static UserRepository userRepo;
-  private static FirstResponderRepository firstResponderRepo;
-  private static ResourceRepository resourceRepo;
+  private final UserRepository userRepo;
+  private final FirstResponderRepository firstResponderRepo;
+  private final ResourceRepository resourceRepo;
+  private final IncidentReportRepository incidentReportRepo;
 
-  public Mapper(UserRepository userRepo, FirstResponderRepository firstResponderRepo, ResourceRepository resourceRepo) {
-    Mapper.userRepo = userRepo;
-    Mapper.firstResponderRepo = firstResponderRepo;
-    Mapper.resourceRepo = resourceRepo;
+  public Mapper(
+      UserRepository userRepo, FirstResponderRepository firstResponderRepo,
+      ResourceRepository resourceRepo, IncidentReportRepository incidentReportRepo
+  ) {
+    this.userRepo = userRepo;
+    this.firstResponderRepo = firstResponderRepo;
+    this.resourceRepo = resourceRepo;
+    this.incidentReportRepo = incidentReportRepo;
   }
 
-  public static UserDto toUserDto(User user) {
+  public UserDto toUserDto(User user) {
     UserDto userDto = new UserDto();
     userDto.setFName(user.getFName());
     userDto.setMInit(user.getMInit());
@@ -33,7 +41,7 @@ public class Mapper {
     return userDto;
   }
 
-  public static UserInfoDto toUserInfoDto(User user) {
+  public UserInfoDto toUserInfoDto(User user) {
     UserInfoDto userInfoDto = new UserInfoDto();
     userInfoDto.setFName(user.getFName());
     userInfoDto.setMInit(user.getMInit());
@@ -42,7 +50,7 @@ public class Mapper {
     return userInfoDto;
   }
 
-  public static AlertDto toAlertDto(Alert alert) {
+  public AlertDto toAlertDto(Alert alert) {
     Optional<User> optUser = userRepo.findById(alert.getC().getId().getUId());
     if (optUser.isEmpty()) {
       return null;
@@ -56,7 +64,7 @@ public class Mapper {
     return alertDto;
   }
 
-  public static EmergencyContactDto toEmergencyContactDto(EmergencyContact ec) {
+  public EmergencyContactDto toEmergencyContactDto(EmergencyContact ec) {
     Optional<User> optUser = userRepo.findById(ec.getU().getId());
     if (optUser.isEmpty()) {
       return null;
@@ -70,7 +78,7 @@ public class Mapper {
     return ecDto;
   }
 
-  public static FirstResponderDto toFirstResponderDto(FirstResponder firstResponder) {
+  public FirstResponderDto toFirstResponderDto(FirstResponder firstResponder) {
     User user = firstResponder.getU();
     Department department = firstResponder.getDep();
     if (user == null || department == null) {
@@ -86,7 +94,7 @@ public class Mapper {
     return firstResponderDto;
   }
 
-  public static ResponseTeamDto toResponseTeamDto(ResponseTeam responseTeam) {
+  public ResponseTeamDto toResponseTeamDto(ResponseTeam responseTeam) {
     FirstResponder teamLead = responseTeam.getTeamLead();
     Department department = responseTeam.getDep();
     if (teamLead == null || department == null) {
@@ -99,27 +107,54 @@ public class Mapper {
     return responseTeamDto;
   }
 
-  public static List<UserDto> toUserDtoList(List<User> users) {
-    return users.stream().map(Mapper::toUserDto).toList();
+  public ResponseTeamIncidentDto toResponseTeamIncidentDto(ResponseTeamIncident responseTeamIncident) {
+    ResponseTeamIncidentDto rti_Dto = new ResponseTeamIncidentDto();
+
+    // These are from ResponseTeamIncident
+    ResponseTeam responseTeam = responseTeamIncident.getRt();
+    IncidentReport incidentReport = responseTeamIncident.getIr();
+
+    // These are from incidentReport
+    Department department = incidentReport.getD();
+    Alert alert = incidentReport.getA();
+    List<Long> resourcesIds = incidentReportRepo.findByDIdandAId(department.getId(), alert.getId());
+    List<String> resources = resourceRepo.getResourceNamesById(resourcesIds);
+
+
+    // Populate the DTO
+    String TeamLeader = responseTeam.getTeamLead().getU().getFName() + " " + responseTeam.getTeamLead().getU().getLName();
+    rti_Dto.setRtTeamLeader(TeamLeader);
+    rti_Dto.setDepName(department.getName());
+    rti_Dto.setIncidentReport(incidentReport.getIrDescription());
+    rti_Dto.setAlertType(alert.getAlertType());
+    rti_Dto.setSeverity(alert.getSeverity());
+    rti_Dto.setReportTime(incidentReport.getIrDate());
+    rti_Dto.setResources(resources);
+
+    return null;
   }
 
-  public static List<UserInfoDto> toUserInfoDtoList(List<User> users) {
-    return users.stream().map(Mapper::toUserInfoDto).toList();
+  public List<UserDto> toUserDtoList(List<User> users) {
+    return users.stream().map(this::toUserDto).toList();
   }
 
-  public static List<AlertDto> toAlertDtoList(List<Alert> alerts) {
-    return alerts.stream().map(Mapper::toAlertDto).toList();
+  public List<UserInfoDto> toUserInfoDtoList(List<User> users) {
+    return users.stream().map(this::toUserInfoDto).toList();
   }
 
-  public static List<EmergencyContactDto> toEC_DtoList(List<EmergencyContact> ecs) {
-    return ecs.stream().map(Mapper::toEmergencyContactDto).toList();
+  public List<AlertDto> toAlertDtoList(List<Alert> alerts) {
+    return alerts.stream().map(this::toAlertDto).toList();
   }
 
-  public static List<FirstResponderDto> toFR_DtoList(List<FirstResponder> firstResponders) {
-    return firstResponders.stream().map(Mapper::toFirstResponderDto).toList();
+  public List<EmergencyContactDto> toEC_DtoList(List<EmergencyContact> ecs) {
+    return ecs.stream().map(this::toEmergencyContactDto).toList();
   }
 
-  public static List<ResponseTeamDto> toResponseTeamDtoList(List<ResponseTeam> responseTeams) {
-    return responseTeams.stream().map(Mapper::toResponseTeamDto).toList();
+  public List<FirstResponderDto> toFR_DtoList(List<FirstResponder> firstResponders) {
+    return firstResponders.stream().map(this::toFirstResponderDto).toList();
+  }
+
+  public List<ResponseTeamDto> toResponseTeamDtoList(List<ResponseTeam> responseTeams) {
+    return responseTeams.stream().map(this::toResponseTeamDto).toList();
   }
 }

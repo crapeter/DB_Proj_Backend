@@ -26,15 +26,20 @@ public class UserService {
   private final UserRepository userRepo;
   private final FirstResponderRepository firstResponderRepo;
   private final CallerRepository callerRepo;
+  private final Mapper mapper;
 
   private static final String FACTORY_ALGORITHM = System.getenv("FACTORY_ALGORITHM");
   private static final String SPEC_ALGORITHM = System.getenv("SPEC_ALGORITHM");
   private static final String CIPHER_ALGORITHM = System.getenv("CIPHER_ALGORITHM");
 
-  public UserService(UserRepository userRepo, FirstResponderRepository firstResponderRepo, CallerRepository callerRepo) {
+  public UserService(
+      UserRepository userRepo, FirstResponderRepository firstResponderRepo,
+      CallerRepository callerRepo, Mapper mapper
+  ) {
     this.userRepo = userRepo;
     this.firstResponderRepo = firstResponderRepo;
     this.callerRepo = callerRepo;
+    this.mapper = mapper;
   }
 
   public ResponseEntity<String> registerUser(User user) {
@@ -54,11 +59,11 @@ public class UserService {
   }
 
   public Iterable<UserDto> getAllUsers() {
-    return Mapper.toUserDtoList(userRepo.findAll());
+    return mapper.toUserDtoList(userRepo.findAll());
   }
 
   public Iterable<UserInfoDto> getUsersInfo() {
-    return Mapper.toUserInfoDtoList(userRepo.findAll());
+    return mapper.toUserInfoDtoList(userRepo.findAll());
   }
 
   public ResponseEntity<String> correctPassword(String password, String email) {

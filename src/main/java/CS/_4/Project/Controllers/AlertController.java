@@ -26,8 +26,7 @@ public class AlertController {
 
   @PostMapping("/create")
   public ResponseEntity<String> createAlert(@RequestBody AlertDto alertDto) {
-    // Logic to create an alert
-    return ResponseEntity.ok("Alert created successfully");
+    return alertService.createAlert(alertDto);
   }
 
   @GetMapping("/previous")

@@ -9,12 +9,14 @@ import java.util.List;
 @Service
 public class ResponseTeamService {
   private final ResponseTeamRepository responseTeamRepo;
+  private final Mapper mapper;
 
-  public ResponseTeamService(ResponseTeamRepository responseTeamRepo) {
+  public ResponseTeamService(ResponseTeamRepository responseTeamRepo, Mapper mapper) {
     this.responseTeamRepo = responseTeamRepo;
+    this.mapper = mapper;
   }
 
   public List<ResponseTeamDto> getResponseTeamByDepId(Long depId) {
-    return responseTeamRepo.findByDepId(depId).stream().map(Mapper::toResponseTeamDto).toList();
+    return responseTeamRepo.findByDepId(depId).stream().map(mapper::toResponseTeamDto).toList();
   }
 }

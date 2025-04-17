@@ -14,6 +14,6 @@ public interface CallerRepository extends JpaRepository<Caller, CallerId> {
   @Query("select c.id.uId from Caller c")
   List<Long> findByUId(Long id);
 
-  @Query("select c.id.cId from Caller c where c.id.uId = ?1")
+  @Query("select c from Caller c where c.id.uId = ?1")
   Caller findById(Long id);
 }
