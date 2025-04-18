@@ -7,7 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/emergency-contacts")
+@RequestMapping("/api/ec")
 public class EmergencyContactController {
   private final EmergencyContactService emergencyContactService;
 

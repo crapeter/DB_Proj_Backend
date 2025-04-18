@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/first-responders")
+@RequestMapping("/api/fr")
 public class FirstResponderController {
   private final FirstResponderService firstResponderService;
 

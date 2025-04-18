@@ -30,7 +30,7 @@ public class AlertController {
   }
 
   @GetMapping("/previous")
-  public Iterable<AlertDto> previousDaysAlerts() {
+  public Iterable<AlertDto> pastTwoDaysAlerts() {
     // Hardcoded to 1 day for data display on the frontend
     return alertService.previousDaysAlerts(1);
   }

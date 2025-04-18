@@ -6,7 +6,6 @@ import CS._4.Project.Repositories.*;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -45,16 +44,6 @@ public class AlertService {
     this.mapper = mapper;
   }
 
-  /*
-   * TODO:
-   *  - Implement the logic to create an alert
-   *  - Validate the AlertDto object
-   *  - Save the alert to the database
-   *  - Notify the user about the alert creation
-   *  - Dispatch a response team to handle the alert (this is ResponseTeamIncident, which joins the incident report
-   *   and response team)
-   *  - Create an incident report for the alert
-   * */
   public ResponseEntity<String> createAlert(AlertDto alertDto) {
     // creation of the alert
     User user = userRepo.findByEmail(alertDto.getCallerEmail());
@@ -134,7 +123,7 @@ public class AlertService {
   }
 
   public List<AlertDto> specificDayAlerts(LocalDateTime day) {
-    return alertRepo.findSpecificDayAlerts(day).stream()
+    return alertRepo.findSpecificDayAlerts(day, day.plusDays(1)).stream()
         .map(mapper::toAlertDto)
         .toList();
   }

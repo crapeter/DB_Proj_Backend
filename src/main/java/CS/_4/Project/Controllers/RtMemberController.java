@@ -5,7 +5,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/response-team-members")
+@RequestMapping("/api/rtm")
 public class RtMemberController {
   private final RtMemberService rtMemberService;
 

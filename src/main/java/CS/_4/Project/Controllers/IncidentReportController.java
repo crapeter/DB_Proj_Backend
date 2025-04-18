@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/api/incident-reports")
+@RequestMapping("/api/ir")
 public class IncidentReportController {
   private final IncidentReportService incidentReportService;
 
