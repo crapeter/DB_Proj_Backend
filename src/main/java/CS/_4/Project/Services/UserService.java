@@ -8,6 +8,8 @@ import CS._4.Project.Models.User;
 import CS._4.Project.Repositories.CallerRepository;
 import CS._4.Project.Repositories.FirstResponderRepository;
 import CS._4.Project.Repositories.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ public class UserService {
   private final FirstResponderRepository firstResponderRepo;
   private final CallerRepository callerRepo;
   private final Mapper mapper;
+
+  private static final Logger logger = LoggerFactory.getLogger(UserService.class);
 
   private static final String FACTORY_ALGORITHM = System.getenv("FACTORY_ALGORITHM");
   private static final String SPEC_ALGORITHM = System.getenv("SPEC_ALGORITHM");
@@ -66,10 +70,10 @@ public class UserService {
     return mapper.toUserInfoDtoList(userRepo.findAll());
   }
 
-  public ResponseEntity<String> correctPassword(String password, String email) {
+  public ResponseEntity<String> correctPassword(String email, String password) {
     User user = userRepo.findByEmail(email);
     if (user == null) {
-      return ResponseEntity.status(404).body("User not found");
+      return ResponseEntity.status(404).body(email);
     }
 
     EncryptionString storedData = new EncryptionString(user.getPassword(), user.getSalt());
@@ -94,7 +98,7 @@ public class UserService {
     }
   }
 
-  private boolean validatePassword(String password, EncryptionString storedData) {
+  private Boolean validatePassword(String password, EncryptionString storedData) {
     try {
       byte[] encrypted = Base64.getDecoder().decode(storedData.encryptedData());
 
@@ -103,9 +107,11 @@ public class UserService {
       byte[] iv = Base64.getDecoder().decode(saltAndIv[1]);
 
       byte[] encryptedPassword = genCodes(password, salt, iv);
+      logger.debug("Encrypted Password: {}", Arrays.toString(encryptedPassword));
+      logger.debug("Stored Encrypted Password: {}", Arrays.toString(encrypted));
       return Arrays.equals(encrypted, encryptedPassword);
     } catch (Exception e) {
-      e.printStackTrace();
+      logger.error("Error validating password", e);
     }
     return false;
   }

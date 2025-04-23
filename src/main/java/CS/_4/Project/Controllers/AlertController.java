@@ -35,11 +35,6 @@ public class AlertController {
     return alertService.previousDaysAlerts(1);
   }
 
-  /*
-  * For the Frontend (ReactJS) use this
-  * const date = new Date();
-  * const isoString = date.toISOString();
-  * */
   @GetMapping("/specific/day")
   public Iterable<AlertDto> specificDayAlerts(@RequestParam LocalDateTime day) {
     return alertService.specificDayAlerts(day);
