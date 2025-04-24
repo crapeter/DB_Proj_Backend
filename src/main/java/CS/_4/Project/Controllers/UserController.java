@@ -21,10 +21,9 @@ public class UserController {
   }
 
   @GetMapping("/login")
-  public ResponseEntity<String> login(@RequestParam String email, @RequestParam String password) {
+  public ResponseEntity<Boolean> login(@RequestParam String email, @RequestParam String password) {
     ResponseEntity<String> response = userService.correctPassword(email, password);
-    return response;
-//    return response.getStatusCode().is2xxSuccessful() ? ResponseEntity.ok(true) : ResponseEntity.ok(false);
+    return response.getStatusCode().is2xxSuccessful() ? ResponseEntity.ok(true) : ResponseEntity.ok(false);
   }
 
   @GetMapping

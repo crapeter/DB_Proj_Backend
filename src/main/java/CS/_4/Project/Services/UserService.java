@@ -73,7 +73,7 @@ public class UserService {
   public ResponseEntity<String> correctPassword(String email, String password) {
     User user = userRepo.findByEmail(email);
     if (user == null) {
-      return ResponseEntity.status(404).body(email);
+      return ResponseEntity.status(404).body("User not found");
     }
 
     EncryptionString storedData = new EncryptionString(user.getPassword(), user.getSalt());
