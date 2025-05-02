@@ -26,17 +26,17 @@ public class IncidentReport {
   private String irDescription;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "D_Id")
   private Department d;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "A_Id")
   private Alert a;
 
   @ManyToOne(fetch = FetchType.LAZY)
-  @OnDelete(action = OnDeleteAction.SET_NULL)
+  @OnDelete(action = OnDeleteAction.CASCADE)
   @JoinColumn(name = "R_Id")
   private Resource r;
 

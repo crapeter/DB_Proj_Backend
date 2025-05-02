@@ -5,7 +5,9 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
+
 public interface EmergencyContactRepository extends JpaRepository<EmergencyContact, Long> {
   @Query("select ec from EmergencyContact ec join ec.u u where u.email = ?1")
-  EmergencyContact findByDependentEmail(@Param("dependentEmail") String dependentEmail);
+  List<EmergencyContact> findByDependentEmail(@Param("dependentEmail") String dependentEmail);
 }

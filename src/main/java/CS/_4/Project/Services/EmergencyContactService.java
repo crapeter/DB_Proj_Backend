@@ -6,6 +6,8 @@ import CS._4.Project.Repositories.EmergencyContactRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 public class EmergencyContactService {
   private final EmergencyContactRepository emergencyContactRepo;
@@ -16,22 +18,22 @@ public class EmergencyContactService {
     this.mapper = mapper;
   }
 
-  public ResponseEntity<String> createEC(EmergencyContact EC) {
+  public ResponseEntity<String> createEC(EmergencyContactDto EC) {
     try {
-      emergencyContactRepo.save(EC);
+      emergencyContactRepo.save(mapper.toEmergencyContact(EC));
       return ResponseEntity.ok("Emergency contact created successfully");
     } catch (Exception e) {
       return ResponseEntity.status(500).body("Error creating emergency contact: " + e.getMessage());
     }
   }
 
-  public ResponseEntity<EmergencyContactDto> getEmergencyContact(String email) {
-    EmergencyContact optEC = emergencyContactRepo.findByDependentEmail(email);
+  public Iterable<EmergencyContactDto> getEmergencyContact(String email) {
+    List<EmergencyContact> optEC = emergencyContactRepo.findByDependentEmail(email);
     if (optEC == null) {
-      return ResponseEntity.notFound().build();
+      return null;
     }
-    EmergencyContactDto ecDto = new EmergencyContactDto();
-    ecDto = mapper.toEmergencyContactDto(optEC);
-    return ResponseEntity.ok(ecDto);
+    return optEC.stream()
+        .map(mapper::toEmergencyContactDto)
+        .toList();
   }
 }

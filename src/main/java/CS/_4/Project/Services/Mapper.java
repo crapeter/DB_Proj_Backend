@@ -73,6 +73,7 @@ public class Mapper {
     EmergencyContactDto ecDto = new EmergencyContactDto();
     ecDto.setDependentEmail(optUser.get().getEmail());
     ecDto.setFName(ec.getFName());
+    ecDto.setMInit(ec.getMInit());
     ecDto.setLName(ec.getLName());
     ecDto.setRelationship(ec.getRelationship());
     return ecDto;
@@ -132,6 +133,22 @@ public class Mapper {
     rti_Dto.setResources(resources);
 
     return rti_Dto;
+  }
+
+  public EmergencyContact toEmergencyContact(EmergencyContactDto ecDto) {
+    EmergencyContact ec = new EmergencyContact();
+    User user = userRepo.findByEmail(ecDto.getDependentEmail());
+    if (user == null) {
+      return null;
+    }
+    ec.setU(user);
+    ec.setFName(ecDto.getFName());
+    ec.setMInit(ecDto.getMInit());
+    ec.setLName(ecDto.getLName());
+    ec.setSex(ecDto.getSex());
+    ec.setDob(ecDto.getDob());
+    ec.setRelationship(ecDto.getRelationship());
+    return ec;
   }
 
   public List<UserDto> toUserDtoList(List<User> users) {
