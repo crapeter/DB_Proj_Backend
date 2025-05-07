@@ -23,4 +23,14 @@ public class EmergencyContactController {
   public Iterable<EmergencyContactDto> getEmergencyContact(@RequestParam String email) {
     return emergencyContactService.getEmergencyContact(email);
   }
+
+  @DeleteMapping()
+  public ResponseEntity<String> deleteEmergencyContact(@RequestParam String email, @RequestParam String fName) {
+    try {
+      emergencyContactService.deleteEmergencyContact(email, fName);
+      return ResponseEntity.ok("Emergency contact deleted successfully");
+    } catch (Exception e) {
+      return ResponseEntity.status(500).body("Error deleting emergency contact: " + e.getMessage());
+    }
+  }
 }

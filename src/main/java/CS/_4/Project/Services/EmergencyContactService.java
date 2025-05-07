@@ -2,19 +2,28 @@ package CS._4.Project.Services;
 
 import CS._4.Project.DTOs.EmergencyContactDto;
 import CS._4.Project.Models.EmergencyContact;
+import CS._4.Project.Models.User;
 import CS._4.Project.Repositories.EmergencyContactRepository;
+import CS._4.Project.Repositories.UserRepository;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class EmergencyContactService {
   private final EmergencyContactRepository emergencyContactRepo;
+  private final UserRepository userRepo;
   private final Mapper mapper;
 
-  public EmergencyContactService(EmergencyContactRepository emergencyContactRepo, Mapper mapper) {
+  public EmergencyContactService(
+      EmergencyContactRepository emergencyContactRepo,
+      UserRepository userRepo,
+      Mapper mapper
+  ) {
     this.emergencyContactRepo = emergencyContactRepo;
+    this.userRepo = userRepo;
     this.mapper = mapper;
   }
 
@@ -35,5 +44,20 @@ public class EmergencyContactService {
     return optEC.stream()
         .map(mapper::toEmergencyContactDto)
         .toList();
+  }
+
+  public void deleteEmergencyContact(String email, String fName) {
+    User user = userRepo.findByEmail(email);
+    if (user == null) {
+      throw new RuntimeException("User with email " + email + " not found");
+    }
+
+    List<EmergencyContact> emergencyContacts = emergencyContactRepo.findByDependentId(user.getId());
+    for (EmergencyContact ec : emergencyContacts) {
+      if (ec.getFName().equals(fName)) {
+        emergencyContactRepo.delete(ec);
+        return;
+      }
+    }
   }
 }

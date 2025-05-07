@@ -8,6 +8,7 @@ import java.time.LocalDate;
 @Data
 public class EmergencyContactDto {
   private String dependentEmail;
+
   @JsonProperty("fName")
   private String fName;
 
@@ -16,6 +17,7 @@ public class EmergencyContactDto {
 
   @JsonProperty("lName")
   private String lName;
+
   private Character sex;
   private LocalDate dob;
   private String relationship;
